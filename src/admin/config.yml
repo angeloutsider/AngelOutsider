@@ -1,0 +1,22 @@
+backend:
+  name: github
+  repo: adal-o/Blog
+  branch: main
+
+media_folder: "src/static/images"   # Where uploaded files go in the repo
+public_folder: "/static/images"     # URL path Eleventy will use
+
+collections:
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "src/posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author", name: "author", widget: "string", default: "Unknown" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Tags", name: "tags", widget: "list", default: ["post"] }
+      - { label: "Featured Image", name: "featuredImage", widget: "image", required: false }
+      - { label: "Layout", name: "layout", widget: "hidden", default: "layouts/post.njk" }
+      - { label: "Body", name: "body", widget: "markdown" }

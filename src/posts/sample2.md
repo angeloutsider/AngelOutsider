@@ -1,7 +1,7 @@
 ---
 title: "Weekend Adventures in the City"
 author: "Raine"
-date: 2025-10-10
+datePosted: 2025-10-10
 featuredImage: "../static/images/homepage.png"
 layout: "layouts/post.njk"
 tags: post

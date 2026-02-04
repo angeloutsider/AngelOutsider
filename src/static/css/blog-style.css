@@ -1,6 +1,7 @@
 /* General Styles */
 :root {
   --pink: #E8B4D9;
+  --pink-dark: #c077ab;
   --pink-light: #F5D9ED;
   --text-dark: #333;
   --bg-white: #FEFEFE;
@@ -50,7 +51,7 @@ body {
   width: 30px;
   height: 3px;
   background-color: var(--pink);
-  transition: all 0.3s ease;
+  transition: all .5s ease;
   border-radius: 2px;
 }
 
@@ -209,6 +210,13 @@ body {
 
 .post-content {
   padding-left: 70px;
+}
+
+.post-content h1 {
+  margin-bottom: 30px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--pink-dark);
 }
 
 .post-content p {

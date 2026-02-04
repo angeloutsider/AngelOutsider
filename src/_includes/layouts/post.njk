@@ -4,7 +4,7 @@ layout: layouts/blog-base.njk
 
 <article class="post-container">
   <header class="post-header">
-    <a href="{{ site.baseUrl }}blog" class="back-button">
+    <a href="{{ site.baseUrl }}blogs" class="back-button">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
@@ -13,7 +13,7 @@ layout: layouts/blog-base.njk
   </header>
 
   <div class="post-meta">
-    <p class="post-author">by {{ author }}</p>
+    <p class="post-author">by {{ author }} • {{ datePosted }}</p>
   </div>
 
   <div class="post-content">

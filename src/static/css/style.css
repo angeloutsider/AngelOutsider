@@ -16,7 +16,41 @@
 .body-home {
     font-family: var(--font-family);
     overflow: hidden;
-    background-image: url('../images/homepage.png');
+    background-image: url('../images/homepage.jpeg');
+    background-repeat: no-repeat;
+    background-position: center center; /* Centers the image */
+    background-attachment: fixed; /* Keeps the background image fixed during scrolling */
+    background-size: cover; /* This is the key property */
+    height: 100vh; /* Ensures the body takes up the full viewport height */
+    margin: 0; /* Removes default body margin */
+}
+
+.body-about {
+    font-family: var(--font-family);
+    overflow: hidden;
+    background-image: url('../images/fruit.jpg');
+    background-repeat: no-repeat;
+    background-position: center center; /* Centers the image */
+    background-attachment: fixed; /* Keeps the background image fixed during scrolling */
+    background-size: cover; /* This is the key property */
+    height: 100vh; /* Ensures the body takes up the full viewport height */
+    margin: 0; /* Removes default body margin */
+}
+
+.body-contact {
+    font-family: var(--font-family);
+    overflow: hidden;
+    background-image: url('../images/apples.jpg');
+    background-repeat: no-repeat;
+    background-position: center center; /* Centers the image */
+    background-attachment: fixed; /* Keeps the background image fixed during scrolling */
+    background-size: cover; /* This is the key property */
+    height: 100vh; /* Ensures the body takes up the full viewport height */
+    margin: 0; /* Removes default body margin */
+}
+
+.body-contact .overlay-text {
+    color: black;
 }
 
 .main-content {
@@ -25,4 +59,53 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
+}
+
+.main-text {
+    position: absolute;
+    top: 48.5%;
+    left: 8%;
+    height: 51px;
+    -webkit-user-select: none; /* Safari, Chrome, Opera */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Standard syntax */
+    display: flex;
+    justify-content: center;
+    align-items: center;     
+    font-size: 3rem;
+    color: white;
+}
+
+.scrolling-banner {
+    width: 100%;
+    overflow: hidden;
+    color: white;
+    padding: 12px 0;
+    white-space: nowrap;
+}
+
+/* Outer wrapper to contain both copies */
+.scrolling-track {
+    display: inline-flex;
+    gap: 0px; /* spacing between items */
+    animation: scroll 30s linear infinite;
+}
+
+.scrolling-item {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    -webkit-user-select: none; /* Safari, Chrome, Opera */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Standard syntax */
+}
+
+@keyframes scroll {
+    from {
+    transform: translateX(0);
+    }
+    to {
+    transform: translateX(-50%);
+    }
 }
