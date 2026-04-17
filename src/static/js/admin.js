@@ -2,6 +2,7 @@
   const REPO = 'adal-o/Blog';
   const BRANCH = 'main';
   const POSTS_PATH = 'src/posts';
+  const BASE_URL = window.siteBaseUrl || '/';
   const API_BASE = 'https://api.github.com';
 
   const patInput = document.getElementById('patInput');
@@ -53,7 +54,7 @@
   });
 
   newPostBtn.addEventListener('click', () => {
-    window.location.href = '/admin/tool/';
+    window.location.href = `${BASE_URL}admin/tool/`;
   });
 
   async function loadPosts() {
@@ -118,7 +119,7 @@
     `;
 
     card.querySelector('.btn-edit').addEventListener('click', () => {
-      window.location.href = `/admin/tool/?file=${encodeURIComponent(file.name)}`;
+      window.location.href = `${BASE_URL}admin/tool/?file=${encodeURIComponent(file.name)}`;
     });
 
     card.querySelector('.btn-delete').addEventListener('click', async () => {
