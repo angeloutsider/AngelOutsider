@@ -5,8 +5,8 @@
   const BASE_URL = window.siteBaseUrl || '/';
   const API_BASE = 'https://api.github.com';
 
-  const patInput = document.getElementById('patInput');
-  const savePatBtn = document.getElementById('savePatBtn');
+  const CLIENT_ID = 'Ov23liMGukj8fb81IFKg';
+
   const authSection = document.getElementById('authSection');
   const mainSection = document.getElementById('mainSection');
   const newPostBtn = document.getElementById('newPostBtn');
@@ -14,6 +14,12 @@
   const postsLoading = document.getElementById('postsLoading');
   const postsList = document.getElementById('postsList');
   const postsError = document.getElementById('postsError');
+  const connectBtn = document.getElementById('connectBtn');
+  const connectStep = document.getElementById('connectStep');
+  const deviceStep = document.getElementById('deviceStep');
+  const userCodeEl = document.getElementById('userCode');
+  const pollStatusEl = document.getElementById('pollStatus');
+  const verificationUrlEl = document.getElementById('verificationUrl');
 
   function getPat() { return localStorage.getItem('gh_pat') || ''; }
 
@@ -28,6 +34,10 @@
   function showAuth() {
     authSection.style.display = 'flex';
     mainSection.style.display = 'none';
+    connectStep.style.display = 'block';
+    deviceStep.style.display = 'none';
+    connectBtn.disabled = false;
+    connectBtn.textContent = 'Connect with GitHub';
   }
 
   function showMain() {
@@ -36,20 +46,61 @@
     loadPosts();
   }
 
-  savePatBtn.addEventListener('click', () => {
-    const pat = patInput.value.trim();
-    if (!pat) return;
-    localStorage.setItem('gh_pat', pat);
-    showMain();
+  connectBtn.addEventListener('click', async () => {
+    connectBtn.disabled = true;
+    connectBtn.textContent = 'Connecting…';
+    try {
+      await startDeviceFlow();
+    } catch (err) {
+      connectBtn.disabled = false;
+      connectBtn.textContent = 'Connect with GitHub';
+      pollStatusEl.textContent = `Error: ${err.message}`;
+    }
   });
 
-  patInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') savePatBtn.click();
-  });
+  async function startDeviceFlow() {
+    const res = await fetch('https://github.com/login/device/code', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: CLIENT_ID, scope: 'repo' }),
+    });
+    if (!res.ok) throw new Error('Failed to start authorization');
+    const { device_code, user_code, verification_uri, interval } = await res.json();
+
+    verificationUrlEl.href = verification_uri;
+    verificationUrlEl.textContent = verification_uri;
+    userCodeEl.textContent = user_code;
+    connectStep.style.display = 'none';
+    deviceStep.style.display = 'block';
+
+    const token = await pollForToken(device_code, interval || 5);
+    localStorage.setItem('gh_pat', token);
+    showMain();
+  }
+
+  async function pollForToken(device_code, interval) {
+    while (true) {
+      await new Promise(r => setTimeout(r, interval * 1000));
+      const res = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: CLIENT_ID,
+          device_code,
+          grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+        }),
+      });
+      const data = await res.json();
+      if (data.access_token) return data.access_token;
+      if (data.error === 'access_denied') throw new Error('Authorization was denied');
+      if (data.error === 'expired_token') throw new Error('Code expired — please try again');
+      if (data.error === 'slow_down') await new Promise(r => setTimeout(r, 5000));
+      // 'authorization_pending' → keep polling
+    }
+  }
 
   signOutBtn.addEventListener('click', () => {
     localStorage.removeItem('gh_pat');
-    patInput.value = '';
     showAuth();
   });
 
