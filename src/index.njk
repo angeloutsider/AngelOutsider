@@ -1,14 +1,36 @@
----
-layout: layouts/base.njk
-bodyClass: body-home
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ site.baseUrl }}static/css/style.css">
+</head>
 
-<div class="scrolling-banner">
-    <div class="scrolling-track" id="scrollTrack">
-        <div class="scrolling-item">｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆</div>
-    </div>
-</div>
+<body class='landing'>
+</body>
 
-<div class='main-text'>
-    GIRL ON DISPLAY
-</div>
+<script>
+// script.js
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Define an array of image URLs
+    const images = [
+        "{{ site.baseUrl }}static/images/landing/2.png",
+        "{{ site.baseUrl }}static/images/landing/3.png",
+        "{{ site.baseUrl }}static/images/landing/4.png",
+        "{{ site.baseUrl }}static/images/landing/5.png",
+        "{{ site.baseUrl }}static/images/landing/Artboard 1@4x.png",
+        "{{ site.baseUrl }}static/images/landing/Untitled-1.png",
+    ];
+
+    const randomIndex = Math.floor(Math.random() * images.length);
+    const selectedImage = images[randomIndex];
+
+    document.body.style.backgroundImage = `url('${selectedImage}')`;
+
+});
+
+document.addEventListener('click', function(event) {
+    window.location.href = "{{ site.baseUrl }}home";
+});
+
+</script>

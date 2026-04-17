@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Blog Post Generator</title>
+    <title>Blog Post Editor</title>
     <link rel="stylesheet" href="{{ site.baseUrl }}static/css/tool-style.css">
 </head>
 <body>
+
+    <!-- Admin nav bar -->
+    <div class="admin-bar">
+        <a href="/admin/" class="admin-bar-back">← All Posts</a>
+        <span id="editorModeLabel" class="admin-bar-mode">New Post</span>
+    </div>
+
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar">
@@ -32,6 +39,14 @@
             <h2>Post Metadata</h2>
 
             <div class="settings-group">
+                <label>File Name</label>
+                <div class="filename-input-group">
+                    <input type="text" id="postFileName" placeholder="my-post-title">
+                    <span class="filename-ext">.md</span>
+                </div>
+            </div>
+
+            <div class="settings-group">
                 <label>Title</label>
                 <input type="text" id="postTitle" placeholder="Post title">
             </div>
@@ -47,45 +62,44 @@
             </div>
 
             <div class="settings-group">
-              <label>Featured Image</label>
-              <div class="featured-image-container">
-                <input type="file" id="featuredImageFile" accept="image/*">
-                <small>OR (prioritizes uploaded image name)</small>
-                <input type="text" id="featuredImage" placeholder="filename.png">
-              </div>
+                <label>Featured Image</label>
+                <div class="featured-image-container">
+                    <input type="file" id="featuredImageFile" accept="image/*">
+                    <small>OR (prioritizes uploaded image name)</small>
+                    <input type="text" id="featuredImage" placeholder="filename.png">
+                </div>
             </div>
 
-            <button class="generate-btn" id="generateMarkdownBtn">Generate Markdown</button>
+            <button class="commit-btn" id="commitBtn">Commit &amp; Push to GitHub</button>
+            <div id="commitStatus" class="commit-status" style="display:none;"></div>
 
+            <div class="divider"></div>
+
+            <button class="generate-btn" id="generateMarkdownBtn">Generate Markdown</button>
             <div class="markdown-output" id="output" style="display:none;"></div>
             <button class="copy-btn" id="copyBtn" style="display:none;">Copy to Clipboard</button>
         </div>
     </div>
 
-    <!-- Modal (centered) - uses blog-style.css for post styling -->
+    <!-- Preview Modal -->
     <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true">
-      <div class="modal" role="document">
-        <div class="modal-header">
-          <div>
-            <strong>Post Preview</strong>
-            <div style="font-size:12px;color:#666;">This shows how the post will render.</div>
-          </div>
-          <div>
-            <button id="exportMdFromModal" class="generate-btn" title="Export markdown">Export Markdown</button>
-            <button id="modalClose" class="modal-close">Close</button>
-          </div>
+        <div class="modal" role="document">
+            <div class="modal-header">
+                <div>
+                    <strong>Post Preview</strong>
+                    <div style="font-size:12px;color:#666;">This shows how the post will render.</div>
+                </div>
+                <div>
+                    <button id="exportMdFromModal" class="generate-btn" title="Export markdown">Export Markdown</button>
+                    <button id="modalClose" class="modal-close">Close</button>
+                </div>
+            </div>
+            <div id="modalContent" class="preview-render" tabindex="0"></div>
         </div>
-
-        <div id="modalContent" class="preview-render" tabindex="0">
-          <!-- Rendered preview inserted here by JS -->
-        </div>
-      </div>
     </div>
 
-    <!-- External JS -->
-      <script>
-      // Set baseUrl for JS to use
-      window.siteBaseUrl = "{{ site.baseUrl }}";
+    <script>
+        window.siteBaseUrl = "{{ site.baseUrl }}";
     </script>
     <script src="{{ site.baseUrl }}static/js/tool.js"></script>
 </body>

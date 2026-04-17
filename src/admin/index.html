@@ -1,12 +1,44 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Content Manager</title>
-  </head>
-  <body>
-    <!-- Loads the Netlify/Decap CMS UI -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Angel Outsider</title>
+  <link rel="stylesheet" href="/static/css/admin-style.css">
+</head>
+<body>
+  <div class="admin-wrapper">
+    <header class="admin-header">
+      <div class="admin-logo">Angel Outsider</div>
+      <div class="admin-subtitle">Post Manager</div>
+    </header>
+
+    <!-- Auth section -->
+    <div id="authSection" class="auth-section">
+      <div class="auth-card">
+        <h2>Connect to GitHub</h2>
+        <p>Enter a GitHub Personal Access Token (classic) with <strong>repo</strong> scope to manage posts.</p>
+        <input type="password" id="patInput" placeholder="ghp_..." autocomplete="off" />
+        <button id="savePatBtn" class="btn-primary">Connect</button>
+        <small>Your token is stored only in your browser's localStorage and is only sent to the GitHub API.</small>
+      </div>
+    </div>
+
+    <!-- Main section (shown after auth) -->
+    <div id="mainSection" class="main-section" style="display:none;">
+      <div class="section-header">
+        <h2>Blog Posts</h2>
+        <button id="newPostBtn" class="btn-primary">+ New Post</button>
+      </div>
+      <div id="postsLoading" class="loading-msg">Loading posts from GitHub...</div>
+      <div id="postsList" class="posts-list"></div>
+      <div id="postsError" class="error-msg" style="display:none;"></div>
+      <div class="section-footer">
+        <button id="signOutBtn" class="btn-ghost">Disconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/admin.js"></script>
+</body>
 </html>

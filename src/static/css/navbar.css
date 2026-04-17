@@ -4,13 +4,14 @@
     left: 0;
     right: 0;
     width: 100%;
-    padding: 0 150px;
+    padding: 0 50px;
     display: flex;
     z-index: 1000;
-    justify-content: right;
+    justify-content: space-between;
     align-items: center;
-    color: rgb(255, 255, 255);
+    color: var(--secondary-color);
     font-size: 25px;
+    font-weight: bold;
 }
 
 .nav-links {
@@ -21,7 +22,7 @@
 .overlay-text .nav-item {
     text-decoration: none;
     color: inherit;
-    font-weight: 400;
+    font-weight: bold;
     padding: 8px 16px;
     transition: all 0.3s ease;
 }
@@ -33,27 +34,27 @@
 }
 
 .overlay-text .nav-item:hover {
-    text-decoration: underline;
-    color: rgb(210, 34, 34);
+    font-style: italic;
 }
 
 .name-logo {
-    height: 40px;
+    height: 2.5em;
     width: auto;
     transition: transform 0.3s ease;
 }
 
 .name-logo:hover {
-    transform: scale(1.1);
+    transform: scale(1.01);
 }
 
 
 @media (max-width: 768px) {
     .overlay-text {
+        margin-top: 20px;
         flex-direction: column;
         gap: 15px;
         top: 10px;
-        font-size: 18px;
+        font-size: 20px;
     }
     
     .nav-links {
@@ -61,7 +62,7 @@
     }
     
     .overlay-text .nav-item {
-        font-size: 14px;
+        font-size: 20px;
         padding: 6px 12px;
     }
 }
@@ -71,9 +72,12 @@
         gap: 10px;
         font-size: 16px;
     }
-    
+
     .overlay-text .nav-item {
-        font-size: 12px;
-        padding: 4px 8px;
+        font-size: 16px;
+        padding: 10px 12px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
     }
 }

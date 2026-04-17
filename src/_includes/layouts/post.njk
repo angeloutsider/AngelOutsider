@@ -13,7 +13,8 @@ layout: layouts/blog-base.njk
   </header>
 
   <div class="post-meta">
-    <p class="post-author">by {{ author }} • {{ datePosted }}</p>
+    <p class="post-date">{{ datePosted | formatDate }}</p>
+    <p class="post-author">by {{ author }}</p>
   </div>
 
   <div class="post-content">

@@ -1,54 +1,24 @@
 ---
-layout: layouts/blog-base.njk
+layout: layouts/base.njk
+bodyClass: body-blog
 title: Recent Posts
 ---
 
-<div class="blog-container">
-  <header class="blog-header">
-    <button class="hamburger-menu" id="hamburgerMenu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <h1 class="page-title">recent posts</h1>
-    
-    <nav class="dropdown-menu" id="dropdownMenu">
-      <ul>
-        <li><a href="{{ site.baseUrl }}" class="nav-item">home</a></li>
-        <li><a href="{{ site.baseUrl }}about">about</a></li>
-        <li><a href="{{ site.baseUrl }}contact">contact</a></li>
-        <li><a href="#">X</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <div class="posts-grid">
-    {% for post in collections.post | reverse %}
-    <article class="post-card">
-      <a href="{{ site.baseUrl }}{{ post.url | removeLeadingSlash }}">
-        <div class="post-image">
-          <img src="{{ post.data.featuredImage }}" alt="{{ post.data.title }}">
-        </div>
-        <h2 class="post-title">{{ post.data.title }}</h2>
-      </a>
-    </article>
-    {% endfor %}
-  </div>
+<div class="scrolling-banner">
+    <div class="scrolling-track" id="scrollTrack">
+        <div class="scrolling-item">｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆.⋆｡⋆☂˚｡⋆｡˚☽˚｡⋆.+*:ꔫ:*﹤｡･:*:･ﾟ★,｡･:*:･ﾟ☆✧༺♥༻∞｡･:*:･ﾟ★,｡･:*:･ﾟ☆</div>
+    </div>
 </div>
 
-<script>
-  const hamburger = document.getElementById('hamburgerMenu');
-  const dropdown = document.getElementById('dropdownMenu');
-  
-  hamburger.addEventListener('click', () => {
-    dropdown.classList.toggle('active');
-    hamburger.classList.toggle('active');
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!hamburger.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('active');
-      hamburger.classList.remove('active');
-    }
-  });
-</script>
+<div class="posts-grid">
+  {% for post in collections.post | reverse %}
+  <article class="post-card">
+    <a href="{{ site.baseUrl }}{{ post.url | removeLeadingSlash }}">
+      <div class="post-image">
+        <img src="{{ post.data.featuredImage }}" alt="{{ post.data.title }}">
+      </div>
+      <h2 class="post-title">{{ post.data.title }}</h2>
+    </a>
+  </article>
+  {% endfor %}
+</div>
