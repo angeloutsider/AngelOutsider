@@ -16,17 +16,11 @@
     <!-- Auth section -->
     <div id="authSection" class="auth-section">
       <div class="auth-card">
-        <div id="connectStep">
-          <h2>Connect to GitHub</h2>
-          <p>Authorize this app to manage your blog posts.</p>
-          <button id="connectBtn" class="btn-primary">Connect with GitHub</button>
-        </div>
-        <div id="deviceStep" style="display:none;">
-          <h2>Enter this code on GitHub</h2>
-          <p>Open <a id="verificationUrl" href="https://github.com/login/device" target="_blank" rel="noopener">github.com/login/device</a> and enter:</p>
-          <div id="userCode" class="device-code">—</div>
-          <p id="pollStatus" class="poll-status">Waiting for authorization…</p>
-        </div>
+        <h2>Connect to GitHub</h2>
+        <p>Enter a GitHub Personal Access Token (classic) with <strong>repo</strong> scope to manage posts.</p>
+        <input type="password" id="patInput" placeholder="ghp_..." autocomplete="off" />
+        <button id="savePatBtn" class="btn-primary">Connect</button>
+        <small>Your token is stored only in your browser's localStorage and is only sent to the GitHub API.</small>
       </div>
     </div>
 
