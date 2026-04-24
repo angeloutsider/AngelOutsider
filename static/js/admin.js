@@ -15,9 +15,27 @@
   const postsList = document.getElementById('postsList');
   const postsError = document.getElementById('postsError');
 
-  let sessionPat = '';
+  const PAT_KEY = 'awu_admin_pat';
+  const PAT_TTL = 25 * 60 * 1000;
 
-  function getPat() { return sessionPat; }
+  function savePat(pat) {
+    localStorage.setItem(PAT_KEY, JSON.stringify({ pat, expiry: Date.now() + PAT_TTL }));
+  }
+
+  function loadPat() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(PAT_KEY));
+      if (stored && stored.expiry > Date.now()) return stored.pat;
+    } catch (_) {}
+    localStorage.removeItem(PAT_KEY);
+    return null;
+  }
+
+  function clearPat() {
+    localStorage.removeItem(PAT_KEY);
+  }
+
+  function getPat() { return loadPat() || ''; }
 
   function ghHeaders(extra = {}) {
     return {
@@ -52,7 +70,7 @@
       patInput.setCustomValidity('');
       return;
     }
-    sessionPat = pat;
+    savePat(pat);
     patInput.value = '';
     showMain();
   });
@@ -62,7 +80,7 @@
   });
 
   signOutBtn.addEventListener('click', () => {
-    sessionPat = '';
+    clearPat();
     patInput.value = '';
     showAuth();
   });
@@ -80,7 +98,7 @@
       const res = await fetch(`${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}`, {
         headers: ghHeaders(),
       });
-      if (res.status === 401) { showAuth(); return; }
+      if (res.status === 401) { clearPat(); showAuth(); return; }
       if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
 
       const files = await res.json();
@@ -170,5 +188,9 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  showAuth();
+  if (loadPat()) {
+    showMain();
+  } else {
+    showAuth();
+  }
 })();
