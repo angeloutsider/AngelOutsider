@@ -46,7 +46,13 @@
 
   // ─── GitHub helpers ───────────────────────────────────────────────────────
 
-  function getPat() { return localStorage.getItem('gh_pat') || ''; }
+  function getPat() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('awu_admin_pat'));
+      if (stored && stored.expiry > Date.now()) return stored.pat;
+    } catch (_) {}
+    return '';
+  }
 
   function ghHeaders(extra = {}) {
     return {
