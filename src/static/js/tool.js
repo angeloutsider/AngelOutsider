@@ -47,11 +47,7 @@
   // ─── GitHub helpers ───────────────────────────────────────────────────────
 
   function getPat() {
-    try {
-      const stored = JSON.parse(localStorage.getItem('awu_admin_pat'));
-      if (stored && stored.expiry > Date.now()) return stored.pat;
-    } catch (_) {}
-    return '';
+    return localStorage.getItem('gh_pat') || '';
   }
 
   function ghHeaders(extra = {}) {
