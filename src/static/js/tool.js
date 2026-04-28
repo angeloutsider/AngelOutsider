@@ -1,6 +1,6 @@
 (() => {
   // GitHub config
-  const REPO = 'adal-o/Blog';
+  const REPO = 'angeloutsider/AngelOutsider';
   const BRANCH = 'main';
   const POSTS_PATH = 'src/posts';
   const IMAGES_PATH = 'src/static/images';
@@ -346,9 +346,9 @@
         pathInput.value = el.content || '';
         pathInput.addEventListener('input', (ev) => updateElement(el.id, ev.target.value, ''));
 
-        if (el.imageData) {
+        if (el.imageData || el.content) {
           const preview = document.createElement('img');
-          preview.src = el.imageData;
+          preview.src = el.imageData || (window.siteBaseUrl || '') + 'static/images/' + el.content;
           preview.alt = '';
           preview.className = 'image-preview';
           Object.assign(preview.style, el.styles);
@@ -585,6 +585,10 @@
       link.rel = 'stylesheet';
       link.href = (window.siteBaseUrl || '') + 'static/css/blog-style.css';
       document.head.appendChild(link);
+      const override = document.createElement('style');
+      override.id = 'tool-blog-override';
+      override.textContent = 'body { display: block !important; background-color: #fff !important; align-items: initial !important; }';
+      document.head.appendChild(override);
     }
 
     modalContent.innerHTML = '';
@@ -640,7 +644,7 @@
         textCol.appendChild(h1);
       } else if (el.type === 'image' && (el.imageData || el.content.trim())) {
         const img = document.createElement('img');
-        img.src = el.imageData || el.content;
+        img.src = el.imageData || (window.siteBaseUrl || '') + 'static/images/' + el.content;
         img.alt = '';
         Object.assign(img.style, el.styles);
         imageCol.appendChild(img);
