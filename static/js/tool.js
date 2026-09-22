@@ -11,6 +11,14 @@
   let dragSrcIndex = null;
   let currentFileSha = null;
 
+  // Text color palette for paragraphs and headers (matches the site palette)
+  const TEXT_COLORS = [
+    { name: 'Pink', value: '#F2928E' },
+    { name: 'Green', value: '#AFC583' },
+    { name: 'Cream', value: '#FCF8E7' },
+    { name: 'Brown', value: '#563838' },
+  ];
+
   // DOM refs
   const canvas = document.getElementById('canvas');
   const addParagraphBtn = document.getElementById('addParagraph');
@@ -118,13 +126,13 @@
       const trimmed = block.trim();
       if (!trimmed) continue;
 
-      if (trimmed.startsWith('<p>')) {
-        const content = trimmed.replace(/^<p>/, '').replace(/<\/p>$/, '').trim();
-        elements.push({ id: nextId(), type: 'paragraph', content: unescHtml(content), imageData: '', styles: {}, caption: '' });
+      if (trimmed.match(/^<p[\s>]/)) {
+        const content = trimmed.replace(/^<p[^>]*>/, '').replace(/<\/p>$/, '').trim();
+        elements.push({ id: nextId(), type: 'paragraph', content: unescHtml(content), imageData: '', styles: parseOpeningTagStyle(trimmed), caption: '' });
 
-      } else if (trimmed.match(/^<h[1-3]>/)) {
-        const content = trimmed.replace(/^<h[1-3]>/, '').replace(/<\/h[1-3]>$/, '').trim();
-        elements.push({ id: nextId(), type: 'header', content: unescHtml(content), imageData: '', styles: {}, caption: '' });
+      } else if (trimmed.match(/^<h[1-3][\s>]/)) {
+        const content = trimmed.replace(/^<h[1-3][^>]*>/, '').replace(/<\/h[1-3]>$/, '').trim();
+        elements.push({ id: nextId(), type: 'header', content: unescHtml(content), imageData: '', styles: parseOpeningTagStyle(trimmed), caption: '' });
 
       } else if (trimmed.startsWith('<figure') || trimmed.startsWith('<img')) {
         // Captioned images are wrapped in <figure>…<figcaption>; uncaptioned
@@ -157,6 +165,13 @@
     const styles = styleM ? parseInlineStyle(styleM[1]) : { width: '100%', aspectRatio: 'auto' };
     const caption = captionM ? unescHtml(captionM[1].trim()) : '';
     return { id: nextId(), type: 'image', content: cleanSrc, imageData: '', styles, caption };
+  }
+
+  // Reads the style="" on a block's opening tag only (e.g. <p style="color: …">).
+  function parseOpeningTagStyle(block) {
+    const openTag = block.match(/^<[^>]*>/);
+    const styleM = openTag && openTag[0].match(/style="([^"]*)"/);
+    return styleM ? parseInlineStyle(styleM[1]) : {};
   }
 
   function parseInlineStyle(styleStr) {
@@ -319,6 +334,8 @@
         styleBtn.textContent = 'Styles';
         styleBtn.addEventListener('click', () => openImageStylePanel(el.id));
         rightControls.appendChild(styleBtn);
+      } else {
+        rightControls.appendChild(createColorPicker(el));
       }
 
       const removeBtn = document.createElement('button');
@@ -336,12 +353,14 @@
         inputEl = document.createElement('textarea');
         inputEl.placeholder = 'Enter paragraph text';
         inputEl.value = el.content || '';
+        inputEl.style.color = el.styles.color || '';
         inputEl.addEventListener('input', (ev) => updateElement(el.id, ev.target.value));
       } else if (el.type === 'header') {
         inputEl = document.createElement('input');
         inputEl.type = 'text';
         inputEl.placeholder = 'Enter header text';
         inputEl.value = el.content || '';
+        inputEl.style.color = el.styles.color || '';
         inputEl.addEventListener('input', (ev) => updateElement(el.id, ev.target.value));
       } else if (el.type === 'image') {
         const imageContainer = document.createElement('div');
@@ -454,6 +473,36 @@
       elements[idx].styles = { ...elements[idx].styles, ...newStyles };
       renderCanvas();
     }
+  }
+
+  // ─── Text color picker ────────────────────────────────────────────────────
+
+  function createColorPicker(el) {
+    const picker = document.createElement('div');
+    picker.className = 'color-picker';
+
+    const current = (el.styles.color || '').toUpperCase();
+    [{ name: 'Default', value: '' }, ...TEXT_COLORS].forEach(({ name, value }) => {
+      const swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'color-swatch' + (value ? '' : ' color-swatch-default');
+      if (value) swatch.style.backgroundColor = value;
+      swatch.title = value ? `${name} (${value})` : 'Default color';
+      swatch.setAttribute('aria-label', swatch.title);
+      if (value.toUpperCase() === current) swatch.classList.add('selected');
+      swatch.addEventListener('click', () => setTextColor(el.id, value));
+      picker.appendChild(swatch);
+    });
+    return picker;
+  }
+
+  function setTextColor(id, color) {
+    const idx = elements.findIndex(e => e.id === id);
+    if (idx < 0) return;
+    const styles = { ...elements[idx].styles };
+    if (color) styles.color = color; else delete styles.color;
+    elements[idx].styles = styles;
+    renderCanvas();
   }
 
   // ─── Image style panel ────────────────────────────────────────────────────
@@ -578,9 +627,9 @@
     let content = '';
     elements.forEach(el => {
       if (el.type === 'paragraph' && el.content.trim()) {
-        content += `<p>${escHtml(el.content)}</p>\n\n`;
+        content += `<p${colorAttr(el)}>${escHtml(el.content)}</p>\n\n`;
       } else if (el.type === 'header' && el.content.trim()) {
-        content += `<h1>${escHtml(el.content)}</h1>\n\n`;
+        content += `<h1${colorAttr(el)}>${escHtml(el.content)}</h1>\n\n`;
       } else if (el.type === 'image' && el.content.trim()) {
         const styleAttr = stylesToInline(el.styles);
         const img = `<img src="{{ site.baseUrl }}static/images/${el.content}" style="${styleAttr}">`;
@@ -601,6 +650,11 @@
     if (fromModalExport) copyToClipboard(true);
 
     return markdown;
+  }
+
+  function colorAttr(el) {
+    const color = el.styles && el.styles.color;
+    return color ? ` style="color: ${color}"` : '';
   }
 
   function stylesToInline(styles) {
@@ -681,10 +735,12 @@
       if (el.type === 'paragraph' && el.content.trim()) {
         const p = document.createElement('p');
         p.textContent = el.content;
+        if (el.styles.color) p.style.color = el.styles.color;
         textCol.appendChild(p);
       } else if (el.type === 'header' && el.content.trim()) {
         const h1 = document.createElement('h1');
         h1.textContent = el.content;
+        if (el.styles.color) h1.style.color = el.styles.color;
         textCol.appendChild(h1);
       } else if (el.type === 'image' && (el.imageData || el.content.trim())) {
         const img = document.createElement('img');
