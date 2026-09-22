@@ -224,3 +224,18 @@ input[type="text"], input[type="date"] { width:100%; padding:6px;  border:1px so
   border: 1px solid #ddd;
   font-size: 14px;
 }
+
+/* Text color swatches on paragraph/header blocks */
+.color-picker { display: flex; gap: 4px; align-items: center; }
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #bbb;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.color-swatch-default {
+  background: linear-gradient(135deg, #fff 45%, #d33 45%, #d33 55%, #fff 55%);
+}
+.color-swatch.selected { outline: 2px solid #007bff; outline-offset: 2px; }
