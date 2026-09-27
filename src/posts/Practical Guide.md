@@ -2,7 +2,7 @@
 title: "A Practical Guide to Feeling the Warmth of Humanity Even Within the Hollow Carcass of Your Digital Hellscape"
 author: "Raine Kosaka with contributions from Amelie Wu"
 date: 2026-09-27
-featuredImage: "/static/images/IMG_6017 Background Removed.png"
+featuredImage: "/static/images/yes.png"
 layout: "layouts/post.njk"
 tags: post
 ---
