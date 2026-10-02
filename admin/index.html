@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'none'">
   <title>Admin — Angel Outsider</title>
   <link rel="stylesheet" href="/AngelOutsider/static/css/admin-style.css">
 </head>
@@ -13,7 +14,6 @@
       <div class="admin-subtitle">Post Manager</div>
     </header>
 
-    <!-- Auth section -->
     <div id="authSection" class="auth-section">
       <div class="auth-card">
         <h2>Connect to GitHub</h2>
@@ -23,7 +23,6 @@
       </div>
     </div>
 
-    <!-- Main section (shown after auth) -->
     <div id="mainSection" class="main-section" style="display:none;">
       <div class="section-header">
         <h2>Blog Posts</h2>
@@ -47,7 +46,6 @@
     </div>
   </div>
 
-  <script>window.siteBaseUrl = "/AngelOutsider/";</script>
-  <script src="/AngelOutsider/static/js/admin.js"></script>
+  <script src="/AngelOutsider/static/js/admin.js" data-base-url="/AngelOutsider/"></script>
 </body>
 </html>

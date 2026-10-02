@@ -1,17 +1,15 @@
 (() => {
-  // GitHub config
   const REPO = 'angeloutsider/AngelOutsider';
   const BRANCH = 'main';
   const POSTS_PATH = 'src/posts';
   const IMAGES_PATH = 'src/static/images';
   const API_BASE = 'https://api.github.com';
+  const BASE_URL = document.currentScript.dataset.baseUrl || '/';
 
-  // State
   let elements = [];
   let dragSrcIndex = null;
   let currentFileSha = null;
 
-  // Text color palette for paragraphs and headers (matches the site palette)
   const TEXT_COLORS = [
     { name: 'Pink', value: '#F2928E' },
     { name: 'Green', value: '#AFC583' },
@@ -19,7 +17,6 @@
     { name: 'Brown', value: '#563838' },
   ];
 
-  // DOM refs
   const canvas = document.getElementById('canvas');
   const addParagraphBtn = document.getElementById('addParagraph');
   const addHeaderBtn = document.getElementById('addHeader');
@@ -52,10 +49,13 @@
   exportMdFromModal.addEventListener('click', () => generateMarkdown(true));
   commitBtn.addEventListener('click', commitToGitHub);
 
-  // ─── GitHub helpers ───────────────────────────────────────────────────────
-
   function getPat() {
-    return localStorage.getItem('gh_pat') || '';
+    return sessionStorage.getItem('gh_pat') || '';
+  }
+
+  function contentsUrl(dir, filename) {
+    if (/[\/\\]|^\.\.?$/.test(filename)) throw new Error(`Invalid file name: ${filename}`);
+    return `${API_BASE}/repos/${REPO}/contents/${dir}/${encodeURIComponent(filename)}`;
   }
 
   function ghHeaders(extra = {}) {
@@ -67,7 +67,6 @@
     };
   }
 
-  // Init: check URL params for ?file= to load an existing post
   async function init() {
     const params = new URLSearchParams(window.location.search);
     const file = params.get('file');
@@ -82,7 +81,7 @@
     setCommitStatus('Loading post…', 'info');
     try {
       const res = await fetch(
-        `${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`,
+        contentsUrl(POSTS_PATH, filename),
         { headers: ghHeaders() }
       );
       if (!res.ok) throw new Error(`GitHub API ${res.status}`);
@@ -106,7 +105,9 @@
     const body = fmMatch[2].trim();
 
     function fmGet(key) {
-      const m = fm.match(new RegExp(`^${key}:\\s*"?([^"\\n]+)"?`, 'm'));
+      const quoted = fm.match(new RegExp(`^${key}:\\s*"((?:[^"\\\\\\n]|\\\\.)*)"`, 'm'));
+      if (quoted) return quoted[1].replace(/\\(.)/g, '$1');
+      const m = fm.match(new RegExp(`^${key}:\\s*(.*)$`, 'm'));
       return m ? m[1].trim() : '';
     }
 
@@ -119,7 +120,6 @@
       document.getElementById('featuredImage').value = featuredRaw.split('/').pop();
     }
 
-    // Parse body blocks (separated by blank lines)
     elements = [];
     const blocks = body.split(/\n{2,}/);
     for (const block of blocks) {
@@ -135,14 +135,11 @@
         elements.push({ id: nextId(), type: 'header', content: unescHtml(content), imageData: '', styles: parseOpeningTagStyle(trimmed), caption: '' });
 
       } else if (trimmed.startsWith('<figure') || trimmed.startsWith('<img')) {
-        // Captioned images are wrapped in <figure>…<figcaption>; uncaptioned
-        // ones are a bare <img>. Both carry the src/style on the <img>.
         elements.push(parseImageBlock(trimmed));
       } else if (trimmed.startsWith('</')) {
-        // Orphaned closing tag (e.g. </p> separated by a blank line) — skip
+        // orphaned closing tag; skip
       } else if (trimmed && !trimmed.startsWith('<')) {
-        // Plain text paragraph — occurs when a <p> block contains internal blank lines.
-        // Strip any orphaned closing tag (e.g. </p>) that ended up on the last line of the block.
+        // <p> split by inner blank lines; drop its trailing closing tag.
         const content = trimmed.replace(/\s*<\/[a-z]+>\s*$/i, '').trim();
         if (content) {
           elements.push({ id: nextId(), type: 'paragraph', content: unescHtml(content), imageData: '', styles: {}, caption: '' });
@@ -158,20 +155,18 @@
     const styleM = block.match(/style="([^"]+)"/);
     const captionM = block.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/i);
     const src = srcM ? srcM[1] : '';
-    // Strip {{ site.baseUrl }}static/images/ or any path prefix
-    const cleanSrc = src
+    const cleanSrc = unescHtml(src)
       .replace(/\{\{[^}]+\}\}static\/images\//, '')
       .replace(/.*\/static\/images\//, '');
-    const styles = styleM ? parseInlineStyle(styleM[1]) : { width: '100%', aspectRatio: 'auto' };
+    const styles = styleM ? parseInlineStyle(unescHtml(styleM[1])) : { width: '100%', aspectRatio: 'auto' };
     const caption = captionM ? unescHtml(captionM[1].trim()) : '';
     return { id: nextId(), type: 'image', content: cleanSrc, imageData: '', styles, caption };
   }
 
-  // Reads the style="" on a block's opening tag only (e.g. <p style="color: …">).
   function parseOpeningTagStyle(block) {
     const openTag = block.match(/^<[^>]*>/);
     const styleM = openTag && openTag[0].match(/style="([^"]*)"/);
-    return styleM ? parseInlineStyle(styleM[1]) : {};
+    return styleM ? parseInlineStyle(unescHtml(styleM[1])) : {};
   }
 
   function parseInlineStyle(styleStr) {
@@ -198,6 +193,13 @@
 
     const rawName = postFileNameEl.value.trim() || 'untitled';
     const filename = rawName.replace(/\.md$/, '') + '.md';
+    let postUrl;
+    try {
+      postUrl = contentsUrl(POSTS_PATH, filename);
+    } catch (err) {
+      setCommitStatus(err.message, 'error');
+      return;
+    }
     const markdown = generateMarkdown();
 
     setCommitStatus('Uploading images…', 'info');
@@ -205,7 +207,6 @@
 
     setCommitStatus('Committing…', 'info');
 
-    // Encode as UTF-8 base64
     const bytes = new TextEncoder().encode(markdown);
     const encoded = btoa(String.fromCharCode(...bytes));
 
@@ -218,7 +219,7 @@
 
     try {
       const res = await fetch(
-        `${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`,
+        postUrl,
         { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) }
       );
       if (!res.ok) {
@@ -237,24 +238,18 @@
 
   async function uploadImageToGitHub(filename, base64) {
     let existingSha;
-    const checkRes = await fetch(
-      `${API_BASE}/repos/${REPO}/contents/${IMAGES_PATH}/${filename}`,
-      { headers: ghHeaders() }
-    );
+    const url = contentsUrl(IMAGES_PATH, filename);
+    const checkRes = await fetch(url, { headers: ghHeaders() });
     if (checkRes.ok) {
       const checkData = await checkRes.json();
       existingSha = checkData.sha;
     }
     const body = { message: `Upload image: ${filename}`, content: base64, branch: BRANCH };
     if (existingSha) body.sha = existingSha;
-    await fetch(
-      `${API_BASE}/repos/${REPO}/contents/${IMAGES_PATH}/${filename}`,
-      { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) }
-    );
+    await fetch(url, { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
   }
 
   async function uploadPendingImages() {
-    // Upload featured image if a file was selected
     const featuredFile = document.getElementById('featuredImageFile').files[0];
     if (featuredFile) {
       try {
@@ -263,14 +258,13 @@
       } catch (_) {}
     }
 
-    // Upload body images
     for (const el of elements) {
       if (el.type !== 'image' || !el.imageData || !el.content) continue;
       const base64 = el.imageData.split(',')[1];
       if (!base64) continue;
       try {
         await uploadImageToGitHub(el.content, base64);
-        el.imageData = ''; // don't re-upload next time
+        el.imageData = '';
       } catch (_) {}
     }
   }
@@ -289,8 +283,6 @@
     commitStatus.className = `commit-status ${type}`;
     commitStatus.style.display = msg ? 'block' : 'none';
   }
-
-  // ─── Canvas / element management ─────────────────────────────────────────
 
   function nextId() {
     return Date.now() + Math.floor(Math.random() * 1000) + elements.length;
@@ -388,12 +380,12 @@
         captionInput.className = 'caption-input';
         captionInput.placeholder = 'Caption (optional)';
         captionInput.value = el.caption || '';
-        // Update in place — re-rendering here would steal focus mid-typing.
+        // No re-render here; it would steal focus.
         captionInput.addEventListener('input', (ev) => updateCaption(el.id, ev.target.value));
 
         if (el.imageData || el.content) {
           const preview = document.createElement('img');
-          preview.src = el.imageData || (window.siteBaseUrl || '') + 'static/images/' + el.content;
+          preview.src = el.imageData || BASE_URL + 'static/images/' + el.content;
           preview.alt = '';
           preview.className = 'image-preview';
           Object.assign(preview.style, el.styles);
@@ -415,7 +407,6 @@
 
       wrapper.appendChild(inputEl);
 
-      // Drag reorder
       wrapper.addEventListener('dragstart', (e) => {
         dragSrcIndex = index;
         wrapper.classList.add('dragging');
@@ -475,8 +466,6 @@
     }
   }
 
-  // ─── Text color picker ────────────────────────────────────────────────────
-
   function createColorPicker(el) {
     const picker = document.createElement('div');
     picker.className = 'color-picker';
@@ -504,8 +493,6 @@
     elements[idx].styles = styles;
     renderCanvas();
   }
-
-  // ─── Image style panel ────────────────────────────────────────────────────
 
   function openImageStylePanel(imageId) {
     const imgEl = elements.find(e => e.id === imageId);
@@ -614,8 +601,6 @@
     return group;
   }
 
-  // ─── Markdown generation ──────────────────────────────────────────────────
-
   function generateMarkdown(fromModalExport = false) {
     const title = document.getElementById('postTitle').value || 'Untitled';
     const author = document.getElementById('postAuthor').value || 'Unknown';
@@ -632,16 +617,16 @@
         content += `<h1${colorAttr(el)}>${escHtml(el.content)}</h1>\n\n`;
       } else if (el.type === 'image' && el.content.trim()) {
         const styleAttr = stylesToInline(el.styles);
-        const img = `<img src="{{ site.baseUrl }}static/images/${el.content}" style="${styleAttr}">`;
+        const img = `<img src="{{ site.baseUrl }}static/images/${escHtml(el.content)}" style="${escHtml(styleAttr)}">`;
         const caption = (el.caption || '').trim();
-        // No blank lines inside the <figure> — the loader splits blocks on them.
+        // No blank lines in <figure>; the loader splits on them.
         content += caption
           ? `<figure class="post-figure">\n  ${img}\n  <figcaption class="image-caption">${escHtml(caption)}</figcaption>\n</figure>\n\n`
           : `${img}\n\n`;
       }
     });
 
-    const markdown = `---\ntitle: "${escQuotes(title)}"\nauthor: "${escQuotes(author)}"\ndate: ${date}\nfeaturedImage: "/static/images/${escQuotes(featured)}"\nlayout: "layouts/post.njk"\ntags: post\n---\n\n${content}`;
+    const markdown = `---\ntitle: "${escYaml(title)}"\nauthor: "${escYaml(author)}"\ndate: ${date}\nfeaturedImage: "/static/images/${escYaml(featured)}"\nlayout: "layouts/post.njk"\ntags: post\n---\n\n${content}`;
 
     outputEl.textContent = markdown;
     outputEl.style.display = 'block';
@@ -654,7 +639,7 @@
 
   function colorAttr(el) {
     const color = el.styles && el.styles.color;
-    return color ? ` style="color: ${color}"` : '';
+    return color ? ` style="color: ${escHtml(color)}"` : '';
   }
 
   function stylesToInline(styles) {
@@ -675,13 +660,11 @@
     );
   }
 
-  // ─── Preview modal ────────────────────────────────────────────────────────
-
   function openModalWithRenderedPreview() {
     if (!document.querySelector('link[href*="blog-style.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = (window.siteBaseUrl || '') + 'static/css/blog-style.css';
+      link.href = BASE_URL + 'static/css/blog-style.css';
       document.head.appendChild(link);
       const override = document.createElement('style');
       override.id = 'tool-blog-override';
@@ -744,7 +727,7 @@
         textCol.appendChild(h1);
       } else if (el.type === 'image' && (el.imageData || el.content.trim())) {
         const img = document.createElement('img');
-        img.src = el.imageData || (window.siteBaseUrl || '') + 'static/images/' + el.content;
+        img.src = el.imageData || BASE_URL + 'static/images/' + el.content;
         img.alt = '';
         Object.assign(img.style, el.styles);
 
@@ -776,25 +759,26 @@
     modalOverlay.style.display = 'none';
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-
+  // Braces are escaped because posts are rendered through Nunjucks.
   function escHtml(str) {
     return String(str || '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/\{/g, '&#123;').replace(/\}/g, '&#125;');
   }
 
   function unescHtml(str) {
     return String(str || '')
-      .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#123;/g, '{')
+      .replace(/&#125;/g, '}').replace(/&amp;/g, '&');
   }
 
-  function escQuotes(str) {
-    return String(str || '').replace(/"/g, '\\"');
+  function escYaml(str) {
+    return String(str || '')
+      .replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+      .replace(/[\r\n]+/g, ' ');
   }
-
-  // ─── Boot ─────────────────────────────────────────────────────────────────
 
   renderCanvas();
   init();
