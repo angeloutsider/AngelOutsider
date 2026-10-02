@@ -52,9 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const postContent = document.querySelector(".post-content");
   if (postContent) {
-    // Markdown wraps images in <p>, so treat a paragraph that contains only
-    // an image as an image too. Captioned images arrive as a <figure> holding
-    // the <img> plus its <figcaption>, which belongs in the image column whole.
+    // Markdown wraps lone images in <p>; captioned images are <figure>.
     const isImageNode = node =>
       node.nodeName === "IMG" ||
       (node.nodeName === "FIGURE" && !!node.querySelector("img")) ||
@@ -63,12 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
         node.children[0].nodeName === "IMG" &&
         !node.textContent.trim());
 
-    // Snapshot the original document order so we can rebuild either layout.
     const originalNodes = Array.from(postContent.childNodes);
 
-    // Wide screens get a two-column layout (text on the left, images stacked
-    // on the right). On mobile we keep the post in document order so images
-    // appear inline between paragraphs instead of all collected at the bottom.
+    // Two columns on wide screens; document order on mobile.
     const wideScreen = window.matchMedia("(min-width: 769px)");
 
     const applyLayout = () => {
@@ -85,8 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
         postContent.appendChild(textCol);
         postContent.appendChild(imageCol);
       } else if (!wideScreen.matches && isSplit) {
-        // Move every node back into document order, then drop the now-empty
-        // column wrappers.
         originalNodes.forEach(node => postContent.appendChild(node));
         postContent.querySelector(".post-text-col")?.remove();
         postContent.querySelector(".post-image-col")?.remove();
@@ -150,8 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Touch listeners must be registered non-passive for preventDefault to
-    // stop the page from scrolling while a sticker is being dragged.
+    // Non-passive so preventDefault blocks scrolling while dragging.
     img.addEventListener("touchstart", e => {
       e.preventDefault();
       const touch = e.touches[0];

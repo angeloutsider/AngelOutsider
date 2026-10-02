@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'none'">
     <title>Blog Post Editor</title>
     <link rel="stylesheet" href="{{ site.baseUrl }}static/css/tool-style.css">
 </head>
 <body>
 
-    <!-- Admin nav bar -->
     <div class="admin-bar">
         <a href="{{ site.baseUrl }}admin/" class="admin-bar-back">← All Posts</a>
         <span id="editorModeLabel" class="admin-bar-mode">New Post</span>
     </div>
 
     <div class="container">
-        <!-- Sidebar -->
         <div class="sidebar">
             <h2>Elements</h2>
             <div class="tools">
@@ -25,7 +24,6 @@
             </div>
         </div>
 
-        <!-- Canvas -->
         <div class="preview">
             <h2>Preview</h2>
             <div class="canvas" id="canvas" aria-label="preview-canvas"></div>
@@ -34,7 +32,6 @@
             </div>
         </div>
 
-        <!-- Settings & Output -->
         <div class="settings">
             <h2>Post Metadata</h2>
 
@@ -81,7 +78,6 @@
         </div>
     </div>
 
-    <!-- Preview Modal -->
     <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true">
         <div class="modal" role="document">
             <div class="modal-header">
@@ -98,9 +94,6 @@
         </div>
     </div>
 
-    <script>
-        window.siteBaseUrl = "{{ site.baseUrl }}";
-    </script>
-    <script src="{{ site.baseUrl }}static/js/tool.js"></script>
+    <script src="{{ site.baseUrl }}static/js/tool.js" data-base-url="{{ site.baseUrl }}"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 (() => {
-  const REPO = 'adal-o/Blog';
+  const REPO = 'angeloutsider/AngelOutsider';
   const BRANCH = 'main';
   const POSTS_PATH = 'src/posts';
-  const BASE_URL = window.siteBaseUrl || '/';
+  const BASE_URL = document.currentScript.dataset.baseUrl || '/';
   const API_BASE = 'https://api.github.com';
 
   const patInput = document.getElementById('patInput');
@@ -19,9 +19,15 @@
   const archivedToggle = document.getElementById('archivedToggle');
   const archivedToggleIcon = document.getElementById('archivedToggleIcon');
 
-  function getPat() { return localStorage.getItem('gh_pat') || ''; }
-  function savePat(pat) { localStorage.setItem('gh_pat', pat); }
-  function clearPat() { localStorage.removeItem('gh_pat'); }
+  // Clear tokens left by the old localStorage version.
+  localStorage.removeItem('gh_pat');
+  function getPat() { return sessionStorage.getItem('gh_pat') || ''; }
+  function savePat(pat) { sessionStorage.setItem('gh_pat', pat); }
+  function clearPat() { sessionStorage.removeItem('gh_pat'); }
+
+  function postUrl(filename) {
+    return `${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${encodeURIComponent(filename)}`;
+  }
 
   function ghHeaders(extra = {}) {
     return {
@@ -201,7 +207,7 @@
     const btn = card.querySelector('.btn-archive');
     if (btn) { btn.disabled = true; btn.textContent = 'Archiving…'; }
     try {
-      const res = await fetch(`${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`, {
+      const res = await fetch(postUrl(filename), {
         headers: ghHeaders(),
       });
       if (!res.ok) throw new Error(`GitHub API ${res.status}`);
@@ -221,7 +227,7 @@
     const btn = card.querySelector('.btn-unarchive');
     if (btn) { btn.disabled = true; btn.textContent = 'Unarchiving…'; }
     try {
-      const res = await fetch(`${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`, {
+      const res = await fetch(postUrl(filename), {
         headers: ghHeaders(),
       });
       if (!res.ok) throw new Error(`GitHub API ${res.status}`);
@@ -239,7 +245,7 @@
 
   async function deletePost(filename, sha, cardEl) {
     try {
-      const res = await fetch(`${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`, {
+      const res = await fetch(postUrl(filename), {
         method: 'DELETE',
         headers: ghHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ message: `Delete post: ${filename}`, sha, branch: BRANCH }),
@@ -264,7 +270,7 @@
     const bytes = new TextEncoder().encode(content);
     const encoded = btoa(String.fromCharCode(...bytes));
     const res = await fetch(
-      `${API_BASE}/repos/${REPO}/contents/${POSTS_PATH}/${filename}`,
+      postUrl(filename),
       {
         method: 'PUT',
         headers: ghHeaders({ 'Content-Type': 'application/json' }),

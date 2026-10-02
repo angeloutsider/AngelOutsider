@@ -3,15 +3,11 @@ on:
   push:
     branches:
       - main
-  # Rebuild daily so scheduled (future-dated) posts go live once their date
-  # arrives. 08:00 UTC ≈ start of the day in Los Angeles (1am PDT / midnight PST).
+  # Daily rebuild publishes scheduled posts (08:00 UTC ≈ midnight LA).
   schedule:
     - cron: "0 8 * * *"
-  # Allow a manual rebuild from the Actions tab.
   workflow_dispatch:
 
-# Only let one deploy run at a time. If newer pushes arrive while a run is in
-# progress, cancel the older run so the latest commit is always deployed last.
 concurrency:
   group: deploy-gh-pages
   cancel-in-progress: true
@@ -37,9 +33,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          #publish_dir is the folder on the docker instance which eleventy builds the pages to.
-          #it is not the docs folder in the repository
           publish_dir: docs
-          #publish_branch is the branch in the repository.
-          #this is where you need to point GitHub pages
           publish_branch: gh-pages

@@ -1,6 +1,3 @@
-/* Post page styles. Loaded after style.css, which provides the shared
-   tokens (:root), reset, nav, and subscribe modal styles. */
-
 body {
     font-family: var(--font-family);
     overflow-y: auto;
@@ -91,9 +88,7 @@ body {
   color: var(--secondary-color);
 }
 
-/* Wrapping a whole section in one <p>…</p> with blank lines inside leaves a
-   stray </p>, which the browser turns into an empty paragraph. Collapse those
-   so they don't add large vertical gaps. */
+/* Hide empty <p>s left by stray </p> tags. */
 .post-content p:empty {
   display: none;
   margin: 0;
@@ -122,8 +117,6 @@ body {
   margin-bottom: 24px;
 }
 
-/* Captioned images: the <figure> carries the spacing so the caption sits
-   directly beneath the image. */
 .post-content figure {
   margin: 0 0 24px;
 }
@@ -140,7 +133,6 @@ body {
   color: var(--primary-color);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .post-container {
     padding: 40px 20px;
@@ -155,8 +147,6 @@ body {
     padding-left: 0;
   }
 
-  /* No columns on mobile — render as a normal block so the document-order
-     content flows with collapsing margins (tight, even paragraph spacing). */
   .post-content {
     display: block;
     margin-top: 130px;

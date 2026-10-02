@@ -47,7 +47,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Auth */
 .auth-section { display: flex; justify-content: center; }
 
 .auth-card {
@@ -94,7 +93,6 @@ body {
   line-height: 1.55;
 }
 
-/* Main */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -116,7 +114,6 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* Post cards */
 .posts-list { display: flex; flex-direction: column; gap: 8px; }
 
 .post-card-admin {
@@ -158,7 +155,6 @@ body {
 
 .post-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-/* Buttons */
 .btn-primary {
   background: var(--primary);
   color: #fff;
@@ -207,7 +203,6 @@ body {
 }
 .btn-ghost:hover { color: var(--text); border-color: #ccc; }
 
-/* Archive / Unarchive buttons */
 .btn-archive {
   background: transparent;
   color: var(--text-muted);
@@ -232,13 +227,11 @@ body {
 }
 .btn-unarchive:hover { background: var(--secondary); color: #fff; }
 
-/* Archived cards */
 .post-card-admin.archived {
   opacity: 0.55;
   background: #f5f2ea;
 }
 
-/* Archived section */
 .archived-section { margin-top: 32px; }
 
 .archived-toggle {
@@ -262,7 +255,6 @@ body {
 
 .archived-list { flex-direction: column; }
 
-/* Messages */
 .loading-msg { font-size: 0.88rem; color: var(--text-muted); padding: 16px 0; }
 .error-msg { font-size: 0.88rem; color: var(--danger); padding: 12px; background: #fff0f0; border: 1px solid #f8d0d0; }
 .empty-msg { font-size: 0.88rem; color: var(--text-muted); padding: 16px 0; }
