@@ -5,7 +5,6 @@ date: 2026-08-24
 featuredImage: "/static/images/SL Version 2 FINAL.jpeg"
 layout: "layouts/post.njk"
 tags: post
-archived: true
 ---
 
 <figure class="post-figure">
