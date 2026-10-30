@@ -47,3 +47,5 @@ tags: post
 
 <p>God willing, I will have many years on this earth and I hope to continually find love and beauty and joy and light even in the darkest of times.</p>
 
+<img src="{{ site.baseUrl }}static/images/F816BF6A-7424-4CD0-B2E4-57BEAC7A6E03portrait of me at 23 (1).png" style="width: 100%; aspect-ratio: auto">
+
